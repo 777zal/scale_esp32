@@ -1,24 +1,13 @@
-#include <stdint.h>
-#include <string.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <inttypes.h>
-#include "nvs.h"
-#include "nvs_flash.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-
-
-#include "time.h"
-#include "sys/time.h"
-
-#include "esp_vfs.h"
-#include "sys/unistd.h"
-
 #include "config.h"
 #include "bt_interface.h"
 
+bt_parameter_t param = {
+    .device_name = DEVICE_NAME,
+    .log_tag = SPP_TAG,
+    .mode = ESP_BT_MODE_CLASSIC_BT
+};
+
 void app_main(void)
 {
-
+    bluetooth_init(&param);
 }

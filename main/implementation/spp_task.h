@@ -8,10 +8,10 @@
 #include "nvs.h"
 #include "nvs_flash.h"
 
-#define SPP_TASK_TAG                   "SPP_TASK"
+#define SPP_TASK_TAG                       "SPP_TASK"
 
 #define SPP_TASK_SIG_WORK_DISPATCH          (0x01)
-
+#define SPP_DATA_LEN                        100
 /**
  * @brief     handler for the dispatched work
  */
