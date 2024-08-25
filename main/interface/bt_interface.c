@@ -1,7 +1,7 @@
 #include "bt_interface.h"
 
 
-static char *device_name;
+// static char *device_name;
 
 
 void bluetooth_init(bt_parameter_t *param)

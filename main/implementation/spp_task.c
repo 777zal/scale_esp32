@@ -12,7 +12,7 @@
 #include "sys/unistd.h"
 
 #define SPP_SERVER_NAME "SPP_SERVER"
-uint16_t    *spp_event_callback;
+static uint16_t  spp_event_callback;
 static char *spp_device_name;
 static char *spp_tag;
 
@@ -70,7 +70,7 @@ done:
     spp_wr_task_shut_down();
 }
 
-void esp_bt_gap_cb(esp_bt_gap_cb_event_t event, esp_bt_gap_cb_param_t *param)
+static void esp_bt_gap_cb(esp_bt_gap_cb_event_t event, esp_bt_gap_cb_param_t *param)
 {
     switch (event) {
     case ESP_BT_GAP_AUTH_CMPL_EVT:{
@@ -125,14 +125,16 @@ void esp_bt_gap_cb(esp_bt_gap_cb_event_t event, esp_bt_gap_cb_param_t *param)
     return;
 }
 
-static void esp_spp_cb(uint16_t e, void *p)
+uint16_t bind_event(esp_spp_cb_event_t input)
 {
-    esp_spp_cb_event_t  event = e;
-    esp_spp_cb_param_t  *param = p;
+    return (uint16_t) input;
+}
+
+static void esp_spp_cb(esp_spp_cb_event_t event, esp_spp_cb_param_t *param)
+{
     char                bda_str[18] = {0};
-
-    *spp_event_callback = e;
-
+    spp_event_callback = bind_event(event);
+    ESP_LOGI("BINDING", "%d", spp_event_callback);
     switch (event) {
     case ESP_SPP_INIT_EVT:
         if (param->init.status == ESP_SPP_SUCCESS) {
@@ -198,11 +200,11 @@ void spp_wr_task_shut_down(void)
 
 void spp_task_init(uint16_t *cb_event, uint8_t mode, char *device_name, char *log_tag)
 {
-    spp_event_callback  = cb_event;
+    // spp_event_callback  = cb_event;
     spp_device_name     = device_name;
     spp_tag             = log_tag;
-    char bda_str[18] = {0};
-
+    // char bda_str[18] = {0};
+    
     esp_err_t ret = nvs_flash_init();
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
         ESP_ERROR_CHECK(nvs_flash_erase());
@@ -216,6 +218,8 @@ void spp_task_init(uint16_t *cb_event, uint8_t mode, char *device_name, char *lo
     if (esp_bt_controller_init(&bt_cfg) != ESP_OK) {
         ESP_LOGE(spp_tag, "%s initialize controller failed", __func__);
         return;
+    } else {
+        ESP_LOGI(spp_tag, "initialize controller OK");
     }
 
     if (esp_bt_controller_enable(mode) != ESP_OK) {
@@ -245,7 +249,17 @@ void spp_task_init(uint16_t *cb_event, uint8_t mode, char *device_name, char *lo
         return;
     }
 
-    // spp_task_task_start_up();
+//     // spp_task_task_start_up();
+
+    // esp_spp_cfg_t bt_spp_cfg = {
+    //     .mode = ESP_SPP_MODE_CB,
+    //     .enable_l2cap_ertm = true,
+    //     .tx_buffer_size = 0, /* Only used for ESP_SPP_MODE_VFS mode */
+    // };
+    // if ((ret = esp_spp_enhanced_init(&bt_spp_cfg)) != ESP_OK) {
+    //     ESP_LOGE(spp_tag, "%s spp init failed: %s", __func__, esp_err_to_name(ret));
+    //     return;
+    // }
 
     esp_spp_cfg_t bt_spp_cfg = BT_SPP_DEFAULT_CONFIG();
     if (esp_spp_enhanced_init(&bt_spp_cfg) != ESP_OK) {
