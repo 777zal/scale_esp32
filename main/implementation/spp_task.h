@@ -17,6 +17,7 @@
  */
 typedef void (* spp_task_cb_t) (uint16_t event, void *param);
 
+
 /* message to be sent */
 typedef struct {
     uint16_t             sig;      /*!< signal to spp_task_task */
@@ -49,4 +50,8 @@ void spp_wr_task_start_up(spp_wr_task_cb_t p_cback, int fd);
 
 void spp_wr_task_shut_down(void);
 
-void spp_task_init(uint16_t *cb_event, uint8_t mode, char *device_name, char *log_tag);
+void spp_task_init(char *device_name, uint8_t mode,  char *log_tag);
+
+uint16_t spp_get_event(void);
+uint8_t  *spp_get_data(void);
+int spp_is_message_available(void);

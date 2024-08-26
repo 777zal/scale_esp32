@@ -23,7 +23,6 @@ typedef enum {
 
 
 typedef struct bt_parameter {
-    bt_spp_event_t      event;
     uint8_t             mode;
     char                *device_name;
     char                *log_tag;
@@ -31,4 +30,5 @@ typedef struct bt_parameter {
 
 void bluetooth_init(bt_parameter_t *param);
 bt_spp_event_t bluetooth_get_event(void);
-char* bluetooth_get_message(void);
+int bluetooth_get_message(void);
+uint8_t *bluetooth_get_data(void);

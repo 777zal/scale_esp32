@@ -15,6 +15,9 @@
 static uint16_t  spp_event_callback;
 static char *spp_device_name;
 static char *spp_tag;
+static uint8_t *spp_data = NULL;
+static int  spp_size = 0;
+static uint8_t data[40];
 
 static const esp_spp_sec_t sec_mask = ESP_SPP_SEC_AUTHENTICATE;
 // static const esp_spp_sec_t sec_mask = ESP_SPP_SEC_NONE;
@@ -47,6 +50,7 @@ static void spp_message_handler(void * param)
     do {
         /* The frequency of calling this function also limits the speed at which the peer device can send data. */
         size = read(fd, spp_data, SPP_DATA_LEN);
+        // spp_size = size;
         if (size < 0) {
             break;
         } else if (size == 0) {
@@ -55,10 +59,15 @@ static void spp_message_handler(void * param)
         } else {
             ESP_LOGI(spp_tag, "fd = %d data_len = %d", fd, size);
             esp_log_buffer_hex(spp_tag, spp_data, size);
-            for (int i = 0; i < 20; ++i) {
-                spp_data[i] = i;
+            for (int i=0; i< size; i++)
+            {
+                data[i] = spp_data[i];
             }
-            size = write(fd, spp_data, 20);
+            // for (int i = 0; i < 20; ++i) {
+            //     spp_data[i] = i;
+            // }
+            spp_size = size;
+            // size = write(fd, spp_data, 20);
             /* To avoid task watchdog */
             vTaskDelay(10 / portTICK_PERIOD_MS);
         }
@@ -125,15 +134,11 @@ static void esp_bt_gap_cb(esp_bt_gap_cb_event_t event, esp_bt_gap_cb_param_t *pa
     return;
 }
 
-uint16_t bind_event(esp_spp_cb_event_t input)
-{
-    return (uint16_t) input;
-}
-
 static void esp_spp_cb(esp_spp_cb_event_t event, esp_spp_cb_param_t *param)
 {
     char                bda_str[18] = {0};
-    spp_event_callback = bind_event(event);
+
+    spp_event_callback = (uint16_t) event;
     ESP_LOGI("BINDING", "%d", spp_event_callback);
     switch (event) {
     case ESP_SPP_INIT_EVT:
@@ -198,12 +203,31 @@ void spp_wr_task_shut_down(void)
     vTaskDelete(NULL);
 }
 
-void spp_task_init(uint16_t *cb_event, uint8_t mode, char *device_name, char *log_tag)
+uint16_t spp_get_event(void)
 {
-    // spp_event_callback  = cb_event;
+    return spp_event_callback;
+}
+
+uint8_t *spp_get_data(void)
+{
+    return &data[0];
+}
+
+int spp_is_message_available(void)
+{
+    // if(spp_data != NULL){
+    //     data = spp_data;
+    //     ESP_LOGI("check", "%d", *data);
+    //     // ESP_LOGI("size", "%d", spp_size);
+    // }
+    return spp_size;
+}
+
+void spp_task_init(char *device_name, uint8_t mode,  char *log_tag)
+{
     spp_device_name     = device_name;
     spp_tag             = log_tag;
-    // char bda_str[18] = {0};
+    char bda_str[18] = {0};
     
     esp_err_t ret = nvs_flash_init();
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
@@ -249,18 +273,6 @@ void spp_task_init(uint16_t *cb_event, uint8_t mode, char *device_name, char *lo
         return;
     }
 
-//     // spp_task_task_start_up();
-
-    // esp_spp_cfg_t bt_spp_cfg = {
-    //     .mode = ESP_SPP_MODE_CB,
-    //     .enable_l2cap_ertm = true,
-    //     .tx_buffer_size = 0, /* Only used for ESP_SPP_MODE_VFS mode */
-    // };
-    // if ((ret = esp_spp_enhanced_init(&bt_spp_cfg)) != ESP_OK) {
-    //     ESP_LOGE(spp_tag, "%s spp init failed: %s", __func__, esp_err_to_name(ret));
-    //     return;
-    // }
-
     esp_spp_cfg_t bt_spp_cfg = BT_SPP_DEFAULT_CONFIG();
     if (esp_spp_enhanced_init(&bt_spp_cfg) != ESP_OK) {
         ESP_LOGE(spp_tag, "%s spp init failed", __func__);
@@ -282,6 +294,5 @@ void spp_task_init(uint16_t *cb_event, uint8_t mode, char *device_name, char *lo
     esp_bt_pin_code_t pin_code;
     esp_bt_gap_set_pin(pin_type, 0, pin_code);
 
-    // ESP_LOGI(spp_tag, "Own address:[%s]", bda2str((uint8_t *)esp_bt_dev_get_address(), bda_str, sizeof(bda_str)));
-
+    ESP_LOGI(spp_tag, "Own address:[%s]", bda2str((uint8_t *)esp_bt_dev_get_address(), bda_str, sizeof(bda_str)));
 }
