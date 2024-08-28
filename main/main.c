@@ -1,11 +1,19 @@
 #include "config.h"
 #include "bt_interface.h"
+#include "weigh_interface.h"
 
 bt_parameter_t param = {
     .device_name = DEVICE_NAME,
     .log_tag = SPP_TAG,
     .mode = ESP_BT_MODE_CLASSIC_BT
 };
+
+wg_parameter_t wg_param = {
+    .event  = 0,
+    .offset = 10,
+    .weight = 100
+};
+
 uint8_t *data;
 
 static void main_task(void * par)
@@ -26,4 +34,5 @@ void app_main(void)
 {
     xTaskCreate(main_task, "task_read", 4096, NULL, 3, NULL);
     bluetooth_init(&param);
+    weigh_init(&wg_param);
 }
