@@ -18,7 +18,11 @@ esp_err_t i2c_master_init(void)
     return i2c_driver_install(i2c_master_port, conf.mode, I2C_MASTER_RX_BUF_DISABLE, I2C_MASTER_TX_BUF_DISABLE, 0);
 }
 
-void ad1115_init(uint8_t *event, uint16_t *offset, uint16_t *weight)
+static void ad1115_message_handler(void * param){
+    
+}
+
+void ad1115_init(void)
 {
     esp_err_t ret = i2c_master_init();
     ESP_ERROR_CHECK( ret );

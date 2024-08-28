@@ -1,6 +1,6 @@
 #include "weigh_interface.h"
 
-void weigh_init(wg_parameter_t *param)
+void weigh_init(void)
 {
-    ad1115_init((uint8_t*) &param->event, param->offset, param->weight);
+    ad1115_init(void);
 }

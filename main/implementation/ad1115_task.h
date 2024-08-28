@@ -10,4 +10,11 @@
 #define I2C_MASTER_RX_BUF_DISABLE   0                          /*!< I2C master doesn't need buffer */
 #define I2C_MASTER_TIMEOUT_MS       1000
 
-void ad1115_init(uint8_t *event, uint16_t *offset, uint16_t *weight);
+typedef struct ad1115_parameter {
+    uint16_t    weight;
+    uint16_t    offset;
+} ad1115_parameter_t;
+
+void ad1115_init(void);
+void ad1115_wr_task_start_up(ad1115_parameter_t p_cback, int fd);
+uint16_t ad1115_get_data(void);
