@@ -2,6 +2,7 @@
 #include "esp_log.h"
 #include "driver/i2c.h"
 
+#define ADS1115_TAG                 "ADS1115_TAG"
 #define I2C_MASTER_SCL_IO           32                         /*!< GPIO number used for I2C master clock */
 #define I2C_MASTER_SDA_IO           33                         /*!< GPIO number used for I2C master data  */
 #define I2C_MASTER_NUM              0                          /*!< I2C master i2c port number, the number of i2c peripheral interfaces available will depend on the chip */
@@ -99,6 +100,9 @@
 #define ADS1X15_REG_CONFIG_CQUE_2CONV (0x0001)  // Assert ALERT/RDY after two conversions
 #define ADS1X15_REG_CONFIG_CQUE_4CONV (0x0002)  // Assert ALERT/RDY after four conversions
 #define ADS1X15_REG_CONFIG_CQUE_NONE (0x0003)   // Disable the comparator and put ALERT/RDY in high state (default)
+
+#define ACK_VAL 0x0                             /*!< I2C ack value */
+#define NACK_VAL 0x1                            /*!< I2C nack value */
 
 void ad1115_init(void);
 void ad1115_wr_task_start_up(ad1115_parameter_t p_cback, int fd);
