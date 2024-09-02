@@ -4,7 +4,4 @@
 #include <stdio.h>
 #include "ad1115_task.h"
 
-
-
 void weigh_init(void);
-uint16_t

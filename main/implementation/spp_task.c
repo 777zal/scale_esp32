@@ -136,7 +136,7 @@ static void esp_bt_gap_cb(esp_bt_gap_cb_event_t event, esp_bt_gap_cb_param_t *pa
 
 static void esp_spp_cb(esp_spp_cb_event_t event, esp_spp_cb_param_t *param)
 {
-    char                bda_str[18] = {0};
+    char bda_str[18] = {0};
 
     spp_event_callback = (uint16_t) event;
     ESP_LOGI("BINDING", "%d", spp_event_callback);
